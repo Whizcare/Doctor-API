@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  availability_services:
+    image: ${DOCKER_REGISTRY-}availabilityservices
+    build:
+      context: .
+      dockerfile: Availability_Services/Dockerfile
