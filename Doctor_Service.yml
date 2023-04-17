@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctor-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doctor-api
+  template:
+    metadata:
+      labels:
+        app: doctor-api
+    spec:
+      containers:
+        - name: doctor-api
+          image: dhanush121/doctork:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doctor-api-service
+spec:
+  type: ClusterIP
+  selector:
+    app: doctor-api
+  ports:
+    - port: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: doctor-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /api/Doctor/GetDoctorsByEmail
+        pathType: Prefix
+        backend:
+          service:
+            name: doctor-api-service
+            port:
+              number: 80
+      
+      - path: /api/Doctor/AddDoctor
+        pathType: Prefix
+        backend:
+          service:
+            name: doctor-api-service
+            port:
+              number: 80
+      - path: /api/Doctor/GetAllDoctors
+        pathType: Prefix
+        backend:
+          service:
+            name: doctor-api-service
+            port:
+              number: 80
+      
+      - path: /api/Doctor/GetDoctorsByAvailability
+        pathType: Prefix
+        backend:
+          service:
+            name: doctor-api-service
+            port:
+              number: 80
+
+
+      - path: /api/PhysicianAvailabilityStatus/AddAvailability
+        pathType: Prefix
+        backend:
+          service:
+            name: doctor-api-service
+            port:
+              number: 80
+      - path: /api/PhysicianAvailabilityStatus/GetStatus
+        pathType: Prefix
+        backend:
+          service:
+            name: doctor-api-service
+            port:
+              number: 80
+      - path: /api/PhysicianAvailabilityStatus/UpdateAvailability
+        pathType: Prefix
+        backend:
+          service:
+            name: doctor-api-service
+            port:
+              number: 80
